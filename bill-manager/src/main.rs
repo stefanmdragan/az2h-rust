@@ -44,7 +44,7 @@ mod menu {
             eprintln!("Description cannot be empty. Bill not added.");
             return;
         }
-        
+
         println!("Enter bill amount:");
         let amount_input = get_line();
         if amount_input.is_empty() {
@@ -60,12 +60,15 @@ mod menu {
             }
         };
 
-        let bill = Bill { description, amount };
+        let bill = Bill {
+            description,
+            amount,
+        };
         bills.add_bill(bill);
         println!("Bill added successfully.");
     }
 
-   pub fn view_bills(bills: &BillManager) {
+    pub fn view_bills(bills: &BillManager) {
         let all_bills = bills.get_bills();
         if all_bills.is_empty() {
             println!("No bills to display.");
@@ -113,7 +116,7 @@ fn main() {
     // main menu loop
     loop {
         MainMenu::display();
-        
+
         let input = get_line();
         match MainMenu::from_input(input.as_str()) {
             Some(MainMenu::AddBill) => {

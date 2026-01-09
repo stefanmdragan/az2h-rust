@@ -13,7 +13,8 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write  # Add this line to allow creating releases
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -30,6 +31,20 @@ jobs:
       - name: Build
         working-directory: ./bill-manager
         run: cargo build --verbose
+      - name: Fmt Check
+        working-directory: ./bill-manager
+        run: cargo fmt --check
       - name: Test
         working-directory: ./bill-manager
         run: cargo test --verbose
+      - name: Create Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: Automated release from commit ${{ github.sha }}
+          draft: false
+          prerelease: false

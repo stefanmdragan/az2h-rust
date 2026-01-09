@@ -5,7 +5,8 @@ edition = "2024"
 authors = ["Stefan Dragan <stefan.m.dragan@gmail.com>"]
 description = "A small bill manager CLI"
 license = "MIT OR Apache-2.0"
-repository = ""
+repository = "https://github.com/stefanmdragan/az2h-rust/tree/main/bill-manager"
+homepage = "https://github.com/stefanmdragan/az2h-rust/tree/main/bill-manager"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
