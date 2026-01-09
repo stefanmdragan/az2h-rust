@@ -1,20 +1,17 @@
-name: Build and Test Buill Manager
+name: Build and Test Bill Manager
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
   pull_request:
-    branches:
-      - main
+    branches: [ "main" ]
 
 env:
   CARGO_TERM_COLOR: always
-  
+
 jobs:
   build:
-    name: Cargo Build and Test
-
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -31,6 +28,8 @@ jobs:
             ~/.cargo/git
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Build
+        working-directory: ./bill-manager
         run: cargo build --verbose
       - name: Test
+        working-directory: ./bill-manager
         run: cargo test --verbose
