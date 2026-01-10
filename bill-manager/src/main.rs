@@ -28,6 +28,15 @@ impl BillManager {
         }
     }
 
+    fn update_bill(&mut self, index: usize, bill: Bill) -> bool {
+        if index < self.bills.len() {
+            self.bills[index] = bill;
+            true
+        } else {
+            false
+        }
+    }
+
     fn get_bills(&self) -> Vec<&Bill> {
         // get borrowed references to bills
         self.bills.iter().collect()
@@ -107,12 +116,67 @@ mod menu {
             eprintln!("No bill found at the given index. No bill removed.");
         }
     }
+
+    pub fn update_bill(bills: &mut BillManager) {
+        println!("Enter the index of the bill to update:");
+        let index_input = get_line();
+        let index: usize = match index_input.parse() {
+            Ok(num) => num,
+            Err(_) => {
+                eprintln!("Invalid index. No bill updated.");
+                return;
+            }
+        };
+
+        // TODO: avoid using get_bills here to prevent constructing a new Vec
+        let mut updated_bill: Bill = match bills.get_bills().get(index - 1) {
+            Some(bill) => (*bill).clone(),
+            None => {
+                eprintln!("No bill found at the given index. No bill updated.");
+                return;
+            }
+        };
+
+        let mut touched = false;
+
+        println!("Enter new bill description:");
+        let description = get_line();
+        if !description.is_empty() {
+            updated_bill.description = description;
+            touched = true;
+        }
+
+        println!("Enter new bill amount:");
+        let amount_input = get_line();
+        if !amount_input.is_empty() {
+            updated_bill.amount = match amount_input.parse() {
+                Ok(num) => num,
+                Err(_) => {
+                    eprintln!("Invalid amount. Bill not updated.");
+                    return;
+                }
+            };
+            touched = true;
+        }
+
+        if !touched {
+            println!("No changes made. Bill not updated.");
+            return;
+        }
+
+        if bills.update_bill(index - 1, updated_bill.clone()) {
+            println!("Bill updated successfully.");
+        } else {
+            eprintln!("No bill found at the given index. No bill updated.");
+        }
+    }
 }
 
 enum MainMenu {
     AddBill,
     ViewBills,
     RemoveBill,
+    UpdateBill,
     Exit,
 }
 
@@ -122,19 +186,22 @@ impl MainMenu {
             "1" => Some(Self::AddBill),
             "2" => Some(Self::ViewBills),
             "3" => Some(Self::RemoveBill),
-            "4" => Some(Self::Exit),
+            "4" => Some(Self::UpdateBill),
+            "5" => Some(Self::Exit),
             _ => None,
         }
     }
 
     fn display() {
-        println!("");
-        println!("Menu:");
+        println!();
+        println!("{}", format!("{:-^1$}", "Main Menu", 80));
+        println!();
         println!("1. Add Bill");
         println!("2. View Bills");
         println!("3. Remove Bill");
-        println!("4. Exit");
-        println!("");
+        println!("4. Update Bill");
+        println!("5. Exit");
+        println!();
         print!("Please select an option: ");
         io::Write::flush(&mut io::stdout()).expect("Failed to flush stdout");
     }
@@ -158,6 +225,10 @@ fn main() {
             Some(MainMenu::RemoveBill) => {
                 menu::view_bills(&bill_manager);
                 menu::remove_bill(&mut bill_manager);
+            }
+            Some(MainMenu::UpdateBill) => {
+                menu::view_bills(&bill_manager);
+                menu::update_bill(&mut bill_manager);
             }
             Some(MainMenu::Exit) | None => {
                 println!("Exiting...");
