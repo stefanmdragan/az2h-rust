@@ -19,6 +19,15 @@ impl BillManager {
         self.bills.push(bill);
     }
 
+    fn remove_bill(&mut self, index: usize) -> bool {
+        if index < self.bills.len() {
+            self.bills.remove(index);
+            true
+        } else {
+            false
+        }
+    }
+
     fn get_bills(&self) -> Vec<&Bill> {
         // get borrowed references to bills
         self.bills.iter().collect()
@@ -80,11 +89,30 @@ mod menu {
             println!("{}. {} - ${:.2}", i + 1, bill.description, bill.amount);
         }
     }
+
+    pub fn remove_bill(bills: &mut BillManager) {
+        println!("Enter the index of the bill to remove:");
+        let index_input = get_line();
+        let index: usize = match index_input.parse() {
+            Ok(num) => num,
+            Err(_) => {
+                eprintln!("Invalid index. No bill removed.");
+                return;
+            }
+        };
+
+        if bills.remove_bill(index - 1) {
+            println!("Bill removed successfully.");
+        } else {
+            eprintln!("No bill found at the given index. No bill removed.");
+        }
+    }
 }
 
 enum MainMenu {
     AddBill,
     ViewBills,
+    RemoveBill,
     Exit,
 }
 
@@ -93,7 +121,8 @@ impl MainMenu {
         match input {
             "1" => Some(Self::AddBill),
             "2" => Some(Self::ViewBills),
-            "3" => Some(Self::Exit),
+            "3" => Some(Self::RemoveBill),
+            "4" => Some(Self::Exit),
             _ => None,
         }
     }
@@ -103,7 +132,8 @@ impl MainMenu {
         println!("Menu:");
         println!("1. Add Bill");
         println!("2. View Bills");
-        println!("3. Exit");
+        println!("3. Remove Bill");
+        println!("4. Exit");
         println!("");
         print!("Please select an option: ");
         io::Write::flush(&mut io::stdout()).expect("Failed to flush stdout");
@@ -124,6 +154,10 @@ fn main() {
             }
             Some(MainMenu::ViewBills) => {
                 menu::view_bills(&bill_manager);
+            }
+            Some(MainMenu::RemoveBill) => {
+                menu::view_bills(&bill_manager);
+                menu::remove_bill(&mut bill_manager);
             }
             Some(MainMenu::Exit) | None => {
                 println!("Exiting...");
